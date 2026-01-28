@@ -419,7 +419,7 @@ export function AdminSalesPage() {
         
         toast.success(`✅ Auto-populated: Lot ${firstLot.batch_lot_number} (Exp: ${formatDate(firstLot.expired_date)}, Stok: ${firstLot.available_qty})`);
       } else {
-        toast.warning('⚠️ Tidak ada stok tersedia untuk produk ini');
+        toast.warning('⚠️ Perhatikan dengan baik');
       }
     } catch (error: any) {
       console.error('Error fetching lots:', error);

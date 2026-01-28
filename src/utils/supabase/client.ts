@@ -2,13 +2,21 @@
 // Singleton Supabase client for browser-side usage
 
 import { createClient } from '@supabase/supabase-js';
-import { projectId, publicAnonKey } from './info';
+// HAPUS baris ini (import info):
+// import { projectId, publicAnonKey } from './info'; 
 import type { Database } from './types';
 
-const supabaseUrl = `https://${projectId}.supabase.co`;
+// AMBIL dari .env menggunakan import.meta.env (Khusus Vite)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+// Validasi agar tidak error senyap
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('⚠️ Supabase URL atau Anon Key hilang. Pastikan file .env sudah dibuat!');
+}
 
 // Create singleton Supabase client
-export const supabase = createClient<Database>(supabaseUrl, publicAnonKey, {
+export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
