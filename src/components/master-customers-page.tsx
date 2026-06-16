@@ -317,7 +317,7 @@ export function MasterCustomersPage() {
           <CardContent>
             <div className="text-2xl font-bold">{customersWithIDAK}</div>
             <p className="text-xs text-muted-foreground">
-              {Math.round((customersWithIDAK / totalCustomers) * 100) || 0}% dari total
+              {totalCustomers > 0 ? Math.round((customersWithIDAK / totalCustomers) * 100) : 0}% dari total
             </p>
           </CardContent>
         </Card>

@@ -3,7 +3,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useId } from 'react';
 import {
   Search,
   Download,
@@ -52,11 +52,17 @@ export function DataTable<T extends Record<string, any>>({
   emptyMessage = 'Tidak ada data untuk ditampilkan',
   isLoading = false,
 }: DataTableProps<T>) {
+  const instanceId = useId();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // Reset to page 1 when data changes (e.g. parent re-fetches)
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [data.length]);
 
   // Filter data based on search query
   const filteredData = data.filter((row) => {
@@ -95,7 +101,7 @@ export function DataTable<T extends Record<string, any>>({
     <div className="space-y-4">
       {/* Header with Search and Export */}
       {(title || searchable || exportable) && (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             {title && <h3 className="text-lg font-semibold">{title}</h3>}
           </div>
@@ -131,7 +137,7 @@ export function DataTable<T extends Record<string, any>>({
       )}
 
       {/* Table */}
-      <div className="rounded-md border border-border bg-card">
+      <div className="table-shell overflow-hidden rounded-xl border border-border bg-card">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
@@ -172,7 +178,7 @@ export function DataTable<T extends Record<string, any>>({
               </TableRow>
             ) : (
               paginatedData.map((row, rowIndex) => (
-                <TableRow key={rowIndex} className="hover:bg-muted/50">
+                <TableRow key={row.id ?? row.item_id ?? row.transaction_id ?? `${instanceId}-${startIndex + rowIndex}`} className="hover:bg-muted/50">
                   {columns.map((column) => (
                     <TableCell key={column.key}>
                       {column.render

@@ -5,11 +5,9 @@
 
 import { useState } from 'react';
 import {
-  LayoutDashboard,
   Package,
   Users,
   FileText,
-  Database,
   ChevronLeft,
   ChevronRight,
   Moon,
@@ -20,7 +18,6 @@ import {
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useTheme } from './theme-provider';
-import { Separator } from './ui/separator';
 // Ganti import figma dengan file lokal:
 import aomaLogo from '../components/aoma.png'; // Sesuaikan nama file Anda
 
@@ -76,7 +73,7 @@ export function AppLayout({ children, currentPage, onNavigate }: AppLayoutProps)
   ];
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden bg-transparent">
       {/* Sidebar */}
       <aside
         className={`flex flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-all duration-300 shadow-sm ${
@@ -168,7 +165,7 @@ export function AppLayout({ children, currentPage, onNavigate }: AppLayoutProps)
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Topbar */}
-        <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
+        <header className="premium-card z-10 flex h-16 items-center justify-between rounded-none border-x-0 border-t-0 px-6">
           <div className="flex items-center gap-3">
             <img 
               src={aomaLogo} 
@@ -201,7 +198,7 @@ export function AppLayout({ children, currentPage, onNavigate }: AppLayoutProps)
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto bg-background p-6">
+        <main className="flex-1 overflow-auto bg-transparent p-6">
           {children}
         </main>
       </div>

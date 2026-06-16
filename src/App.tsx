@@ -67,7 +67,7 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen">
+      <div className="aoma-app-shell min-h-screen">
         <AppLayout currentPage={currentPage} onNavigate={(page) => setCurrentPage(page as PageType)}>
           {isCheckingSetup ? (
             <div className="flex h-96 items-center justify-center">

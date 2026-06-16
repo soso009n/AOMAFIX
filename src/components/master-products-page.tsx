@@ -8,7 +8,16 @@ import { Plus, Edit2, Trash2, Package } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from './ui/alert-dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { DataTable } from './data-table';
@@ -23,6 +32,9 @@ export function MasterProductsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+
   const [formData, setFormData] = useState({
     nama_produk: '',
     kode_produk: '',
@@ -89,17 +101,30 @@ export function MasterProductsPage() {
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Apakah Anda yakin ingin menghapus produk ini?')) return;
+  function openDeleteDialog(product: Product) {
+    setDeletingProduct(product);
+    setIsDeleteDialogOpen(true);
+  }
+
+  async function handleDelete() {
+    if (!deletingProduct) return;
 
     try {
-      const { error } = await supabase.from('products').delete().eq('id', id);
+      const { error } = await supabase.from('products').delete().eq('id', deletingProduct.id);
 
-      if (error) throw error;
+      if (error) {
+        if (error.code === '23503') {
+          toast.error('Produk tidak dapat dihapus karena masih digunakan dalam transaksi.');
+          return;
+        }
+        throw error;
+      }
       toast.success('Produk berhasil dihapus!');
+      setIsDeleteDialogOpen(false);
+      setDeletingProduct(null);
       loadProducts();
     } catch (error: any) {
-      toast.error('Error: ' + error.message);
+      toast.error('Error menghapus produk: ' + error.message);
     }
   }
 
@@ -319,7 +344,7 @@ export function MasterProductsPage() {
                       variant="ghost"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDelete(row.id);
+                        openDeleteDialog(row);
                       }}
                       className="hover:bg-destructive/10"
                       title="Hapus Produk"
@@ -348,6 +373,37 @@ export function MasterProductsPage() {
           />
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Konfirmasi Hapus Produk</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus produk ini?
+              <br />
+              <br />
+              <strong>Nama Produk:</strong> {deletingProduct?.nama_produk}
+              <br />
+              <strong>Kode Produk:</strong> {deletingProduct?.kode_produk}
+              <br />
+              <strong>Pabrik:</strong> {deletingProduct?.nama_pabrik}
+              <br />
+              <br />
+              ⚠️ Aksi ini tidak dapat dibatalkan!
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeletingProduct(null)}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
+              Hapus Produk
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
